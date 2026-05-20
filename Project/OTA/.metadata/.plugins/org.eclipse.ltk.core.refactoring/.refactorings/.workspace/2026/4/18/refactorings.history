@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Delete resource &apos;App1_Bootloader&apos;" deleteContents="true" description="Delete resource &apos;App1_Bootloader&apos;" element1="/App1_Bootloader" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1777524217138"/>
-</session>
