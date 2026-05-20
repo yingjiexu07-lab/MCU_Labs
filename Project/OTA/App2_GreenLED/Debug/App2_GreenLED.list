@@ -1,0 +1,320 @@
+
+App2_GreenLED.elf:     file format elf32-littlearm
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .isr_vector   00000188  08008000  08008000  00001000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .text         00000178  08008188  08008188  00001188  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .rodata       00000000  08008300  08008308  00001308  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .ARM.extab    00000000  08008300  08008300  00001308  2**0
+                  CONTENTS, READONLY
+  4 .ARM          00000000  08008300  08008300  00001308  2**0
+                  CONTENTS, READONLY
+  5 .preinit_array 00000000  08008300  08008308  00001308  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .init_array   00000004  08008300  08008300  00001300  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  7 .fini_array   00000004  08008304  08008304  00001304  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  8 .data         00000000  20000000  20000000  00001308  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  9 .ccmram       00000000  10000000  10000000  00001308  2**0
+                  CONTENTS
+ 10 .bss          0000001c  20000000  20000000  00002000  2**2
+                  ALLOC
+ 11 ._user_heap_stack 00000604  2000001c  2000001c  00002000  2**0
+                  ALLOC
+ 12 .ARM.attributes 00000030  00000000  00000000  00001308  2**0
+                  CONTENTS, READONLY
+ 13 .debug_info   000000fe  00000000  00000000  00001338  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 14 .debug_abbrev 000000b4  00000000  00000000  00001436  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 15 .debug_aranges 00000050  00000000  00000000  000014f0  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 16 .debug_rnglists 00000032  00000000  00000000  00001540  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 17 .debug_macro  00000fa0  00000000  00000000  00001572  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 18 .debug_line   000004ce  00000000  00000000  00002512  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 19 .debug_str    00003cff  00000000  00000000  000029e0  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 20 .comment      00000043  00000000  00000000  000066df  2**0
+                  CONTENTS, READONLY
+ 21 .debug_frame  0000007c  00000000  00000000  00006724  2**2
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+ 22 .debug_line_str 00000048  00000000  00000000  000067a0  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+
+Disassembly of section .text:
+
+08008188 <__do_global_dtors_aux>:
+ 8008188:	b510      	push	{r4, lr}
+ 800818a:	4c05      	ldr	r4, [pc, #20]	@ (80081a0 <__do_global_dtors_aux+0x18>)
+ 800818c:	7823      	ldrb	r3, [r4, #0]
+ 800818e:	b933      	cbnz	r3, 800819e <__do_global_dtors_aux+0x16>
+ 8008190:	4b04      	ldr	r3, [pc, #16]	@ (80081a4 <__do_global_dtors_aux+0x1c>)
+ 8008192:	b113      	cbz	r3, 800819a <__do_global_dtors_aux+0x12>
+ 8008194:	4804      	ldr	r0, [pc, #16]	@ (80081a8 <__do_global_dtors_aux+0x20>)
+ 8008196:	f3af 8000 	nop.w
+ 800819a:	2301      	movs	r3, #1
+ 800819c:	7023      	strb	r3, [r4, #0]
+ 800819e:	bd10      	pop	{r4, pc}
+ 80081a0:	20000000 	.word	0x20000000
+ 80081a4:	00000000 	.word	0x00000000
+ 80081a8:	080082e8 	.word	0x080082e8
+
+080081ac <frame_dummy>:
+ 80081ac:	b508      	push	{r3, lr}
+ 80081ae:	4b03      	ldr	r3, [pc, #12]	@ (80081bc <frame_dummy+0x10>)
+ 80081b0:	b11b      	cbz	r3, 80081ba <frame_dummy+0xe>
+ 80081b2:	4903      	ldr	r1, [pc, #12]	@ (80081c0 <frame_dummy+0x14>)
+ 80081b4:	4803      	ldr	r0, [pc, #12]	@ (80081c4 <frame_dummy+0x18>)
+ 80081b6:	f3af 8000 	nop.w
+ 80081ba:	bd08      	pop	{r3, pc}
+ 80081bc:	00000000 	.word	0x00000000
+ 80081c0:	20000004 	.word	0x20000004
+ 80081c4:	080082e8 	.word	0x080082e8
+
+080081c8 <delay>:
+// 定義 RCC 與 GPIOD 寄存器位址 (以 STM32F407 為例)
+#define RCC_AHB1ENR  (*(volatile uint32_t *)(0x40023830))
+#define GPIOD_MODER  (*(volatile uint32_t *)(0x40020C00))
+#define GPIOD_ODR    (*(volatile uint32_t *)(0x40020C14))
+
+void delay(void) {
+ 80081c8:	b480      	push	{r7}
+ 80081ca:	b083      	sub	sp, #12
+ 80081cc:	af00      	add	r7, sp, #0
+    for(volatile uint32_t i = 0; i < 200000; i++);
+ 80081ce:	2300      	movs	r3, #0
+ 80081d0:	607b      	str	r3, [r7, #4]
+ 80081d2:	e002      	b.n	80081da <delay+0x12>
+ 80081d4:	687b      	ldr	r3, [r7, #4]
+ 80081d6:	3301      	adds	r3, #1
+ 80081d8:	607b      	str	r3, [r7, #4]
+ 80081da:	687b      	ldr	r3, [r7, #4]
+ 80081dc:	4a04      	ldr	r2, [pc, #16]	@ (80081f0 <delay+0x28>)
+ 80081de:	4293      	cmp	r3, r2
+ 80081e0:	d9f8      	bls.n	80081d4 <delay+0xc>
+}
+ 80081e2:	bf00      	nop
+ 80081e4:	bf00      	nop
+ 80081e6:	370c      	adds	r7, #12
+ 80081e8:	46bd      	mov	sp, r7
+ 80081ea:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 80081ee:	4770      	bx	lr
+ 80081f0:	00030d3f 	.word	0x00030d3f
+
+080081f4 <main>:
+
+int main(void)
+{
+ 80081f4:	b580      	push	{r7, lr}
+ 80081f6:	af00      	add	r7, sp, #0
+
+	*((volatile uint32_t *)(0xE000ED08)) = 0x08008000; // 這就是 SCB->VTOR
+ 80081f8:	4b0f      	ldr	r3, [pc, #60]	@ (8008238 <main+0x44>)
+ 80081fa:	4a10      	ldr	r2, [pc, #64]	@ (800823c <main+0x48>)
+ 80081fc:	601a      	str	r2, [r3, #0]
+    // 1. 開啟 GPIOD 的時鐘 (F407 的 LED 在 PORT D)
+    RCC_AHB1ENR |= (1 << 3);
+ 80081fe:	4b10      	ldr	r3, [pc, #64]	@ (8008240 <main+0x4c>)
+ 8008200:	681b      	ldr	r3, [r3, #0]
+ 8008202:	4a0f      	ldr	r2, [pc, #60]	@ (8008240 <main+0x4c>)
+ 8008204:	f043 0308 	orr.w	r3, r3, #8
+ 8008208:	6013      	str	r3, [r2, #0]
+
+    // 2. 設定 PD12 為輸出模式 (綠色 LED)
+    GPIOD_MODER |= (1 << 24);
+ 800820a:	4b0e      	ldr	r3, [pc, #56]	@ (8008244 <main+0x50>)
+ 800820c:	681b      	ldr	r3, [r3, #0]
+ 800820e:	4a0d      	ldr	r2, [pc, #52]	@ (8008244 <main+0x50>)
+ 8008210:	f043 7380 	orr.w	r3, r3, #16777216	@ 0x1000000
+ 8008214:	6013      	str	r3, [r2, #0]
+    GPIOD_MODER &= ~(1 << 25);
+ 8008216:	4b0b      	ldr	r3, [pc, #44]	@ (8008244 <main+0x50>)
+ 8008218:	681b      	ldr	r3, [r3, #0]
+ 800821a:	4a0a      	ldr	r2, [pc, #40]	@ (8008244 <main+0x50>)
+ 800821c:	f023 7300 	bic.w	r3, r3, #33554432	@ 0x2000000
+ 8008220:	6013      	str	r3, [r2, #0]
+
+    /* Loop forever */
+    while(1) {
+        GPIOD_ODR ^= (1 << 12); // 切換 PD12 電位 (閃爍)
+ 8008222:	4b09      	ldr	r3, [pc, #36]	@ (8008248 <main+0x54>)
+ 8008224:	681b      	ldr	r3, [r3, #0]
+ 8008226:	4a08      	ldr	r2, [pc, #32]	@ (8008248 <main+0x54>)
+ 8008228:	f483 5380 	eor.w	r3, r3, #4096	@ 0x1000
+ 800822c:	6013      	str	r3, [r2, #0]
+        delay();
+ 800822e:	f7ff ffcb 	bl	80081c8 <delay>
+        GPIOD_ODR ^= (1 << 12); // 切換 PD12 電位 (閃爍)
+ 8008232:	bf00      	nop
+ 8008234:	e7f5      	b.n	8008222 <main+0x2e>
+ 8008236:	bf00      	nop
+ 8008238:	e000ed08 	.word	0xe000ed08
+ 800823c:	08008000 	.word	0x08008000
+ 8008240:	40023830 	.word	0x40023830
+ 8008244:	40020c00 	.word	0x40020c00
+ 8008248:	40020c14 	.word	0x40020c14
+
+0800824c <Reset_Handler>:
+
+  .section .text.Reset_Handler
+  .weak Reset_Handler
+  .type Reset_Handler, %function
+Reset_Handler:
+  ldr   r0, =_estack
+ 800824c:	480d      	ldr	r0, [pc, #52]	@ (8008284 <LoopForever+0x2>)
+  mov   sp, r0          /* set stack pointer */
+ 800824e:	4685      	mov	sp, r0
+/* Call the clock system initialization function.*/
+  bl  SystemInit
+ 8008250:	f3af 8000 	nop.w
+
+/* Copy the data segment initializers from flash to SRAM */
+  ldr r0, =_sdata
+ 8008254:	480c      	ldr	r0, [pc, #48]	@ (8008288 <LoopForever+0x6>)
+  ldr r1, =_edata
+ 8008256:	490d      	ldr	r1, [pc, #52]	@ (800828c <LoopForever+0xa>)
+  ldr r2, =_sidata
+ 8008258:	4a0d      	ldr	r2, [pc, #52]	@ (8008290 <LoopForever+0xe>)
+  movs r3, #0
+ 800825a:	2300      	movs	r3, #0
+  b LoopCopyDataInit
+ 800825c:	e002      	b.n	8008264 <LoopCopyDataInit>
+
+0800825e <CopyDataInit>:
+
+CopyDataInit:
+  ldr r4, [r2, r3]
+ 800825e:	58d4      	ldr	r4, [r2, r3]
+  str r4, [r0, r3]
+ 8008260:	50c4      	str	r4, [r0, r3]
+  adds r3, r3, #4
+ 8008262:	3304      	adds	r3, #4
+
+08008264 <LoopCopyDataInit>:
+
+LoopCopyDataInit:
+  adds r4, r0, r3
+ 8008264:	18c4      	adds	r4, r0, r3
+  cmp r4, r1
+ 8008266:	428c      	cmp	r4, r1
+  bcc CopyDataInit
+ 8008268:	d3f9      	bcc.n	800825e <CopyDataInit>
+
+/* Zero fill the bss segment. */
+  ldr r2, =_sbss
+ 800826a:	4a0a      	ldr	r2, [pc, #40]	@ (8008294 <LoopForever+0x12>)
+  ldr r4, =_ebss
+ 800826c:	4c0a      	ldr	r4, [pc, #40]	@ (8008298 <LoopForever+0x16>)
+  movs r3, #0
+ 800826e:	2300      	movs	r3, #0
+  b LoopFillZerobss
+ 8008270:	e001      	b.n	8008276 <LoopFillZerobss>
+
+08008272 <FillZerobss>:
+
+FillZerobss:
+  str  r3, [r2]
+ 8008272:	6013      	str	r3, [r2, #0]
+  adds r2, r2, #4
+ 8008274:	3204      	adds	r2, #4
+
+08008276 <LoopFillZerobss>:
+
+LoopFillZerobss:
+  cmp r2, r4
+ 8008276:	42a2      	cmp	r2, r4
+  bcc FillZerobss
+ 8008278:	d3fb      	bcc.n	8008272 <FillZerobss>
+
+
+/* Call static constructors */
+  bl __libc_init_array
+ 800827a:	f000 f811 	bl	80082a0 <__libc_init_array>
+/* Call the application's entry point.*/
+
+  bl main
+ 800827e:	f7ff ffb9 	bl	80081f4 <main>
+
+08008282 <LoopForever>:
+
+LoopForever:
+  b LoopForever
+ 8008282:	e7fe      	b.n	8008282 <LoopForever>
+  ldr   r0, =_estack
+ 8008284:	20020000 	.word	0x20020000
+  ldr r0, =_sdata
+ 8008288:	20000000 	.word	0x20000000
+  ldr r1, =_edata
+ 800828c:	20000000 	.word	0x20000000
+  ldr r2, =_sidata
+ 8008290:	08008308 	.word	0x08008308
+  ldr r2, =_sbss
+ 8008294:	20000000 	.word	0x20000000
+  ldr r4, =_ebss
+ 8008298:	2000001c 	.word	0x2000001c
+
+0800829c <ADC_IRQHandler>:
+ * @retval : None
+*/
+  .section .text.Default_Handler,"ax",%progbits
+Default_Handler:
+Infinite_Loop:
+  b Infinite_Loop
+ 800829c:	e7fe      	b.n	800829c <ADC_IRQHandler>
+	...
+
+080082a0 <__libc_init_array>:
+ 80082a0:	b570      	push	{r4, r5, r6, lr}
+ 80082a2:	4b0d      	ldr	r3, [pc, #52]	@ (80082d8 <__libc_init_array+0x38>)
+ 80082a4:	4d0d      	ldr	r5, [pc, #52]	@ (80082dc <__libc_init_array+0x3c>)
+ 80082a6:	1b5b      	subs	r3, r3, r5
+ 80082a8:	109c      	asrs	r4, r3, #2
+ 80082aa:	2600      	movs	r6, #0
+ 80082ac:	42a6      	cmp	r6, r4
+ 80082ae:	d109      	bne.n	80082c4 <__libc_init_array+0x24>
+ 80082b0:	f000 f81a 	bl	80082e8 <_init>
+ 80082b4:	4d0a      	ldr	r5, [pc, #40]	@ (80082e0 <__libc_init_array+0x40>)
+ 80082b6:	4b0b      	ldr	r3, [pc, #44]	@ (80082e4 <__libc_init_array+0x44>)
+ 80082b8:	1b5b      	subs	r3, r3, r5
+ 80082ba:	109c      	asrs	r4, r3, #2
+ 80082bc:	2600      	movs	r6, #0
+ 80082be:	42a6      	cmp	r6, r4
+ 80082c0:	d105      	bne.n	80082ce <__libc_init_array+0x2e>
+ 80082c2:	bd70      	pop	{r4, r5, r6, pc}
+ 80082c4:	f855 3b04 	ldr.w	r3, [r5], #4
+ 80082c8:	4798      	blx	r3
+ 80082ca:	3601      	adds	r6, #1
+ 80082cc:	e7ee      	b.n	80082ac <__libc_init_array+0xc>
+ 80082ce:	f855 3b04 	ldr.w	r3, [r5], #4
+ 80082d2:	4798      	blx	r3
+ 80082d4:	3601      	adds	r6, #1
+ 80082d6:	e7f2      	b.n	80082be <__libc_init_array+0x1e>
+ 80082d8:	08008300 	.word	0x08008300
+ 80082dc:	08008300 	.word	0x08008300
+ 80082e0:	08008300 	.word	0x08008300
+ 80082e4:	08008304 	.word	0x08008304
+
+080082e8 <_init>:
+ 80082e8:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 80082ea:	bf00      	nop
+ 80082ec:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 80082ee:	bc08      	pop	{r3}
+ 80082f0:	469e      	mov	lr, r3
+ 80082f2:	4770      	bx	lr
+
+080082f4 <_fini>:
+ 80082f4:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+ 80082f6:	bf00      	nop
+ 80082f8:	bcf8      	pop	{r3, r4, r5, r6, r7}
+ 80082fa:	bc08      	pop	{r3}
+ 80082fc:	469e      	mov	lr, r3
+ 80082fe:	4770      	bx	lr

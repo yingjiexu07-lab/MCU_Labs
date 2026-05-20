@@ -1,0 +1,14 @@
+11:31:22 **** Incremental Build of configuration Debug for project PWM_breathing_light ****
+make -j12 all 
+arm-none-eabi-size  PWM_breathing_light.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10040	     12	   1644	  11696	   2db0	PWM_breathing_light.elf
+Finished building: default.size.stdout
+ 
+11:31:24 **** Incremental Build of configuration Debug for project PWM_breathing_light ****
+make -j12 all 
+arm-none-eabi-size  PWM_breathing_light.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10040	     12	   1644	  11696	   2db0	PWM_breathing_light.elf
+Finished building: default.size.stdout
+ 
